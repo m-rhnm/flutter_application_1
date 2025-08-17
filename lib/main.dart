@@ -12,6 +12,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    Color surfaceColor = Color(0x0dffffff);
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -34,8 +35,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blueGrey,
         primaryColor: Colors.pink.shade400,
         brightness: Brightness.dark,
-        dividerColor:  Color.fromARGB(100, 255, 255, 255),
-        dividerTheme: DividerThemeData(indent: 32,endIndent: 32,),
+        dividerColor: surfaceColor,
         scaffoldBackgroundColor: Color.fromARGB(255, 30, 30, 30),
         appBarTheme: AppBarTheme(backgroundColor: Colors.black),
         textTheme: GoogleFonts.latoTextTheme().copyWith(
@@ -61,12 +61,27 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+enum SkillType { photoshop, xD, illustrator, afterEffects, lightRoom }
+
+class _MyHomePageState extends State<MyHomePage> {
+  SkillType skillType = SkillType.photoshop;
+  void onSkillTap(SkillType type) {
+    setState(() {
+      skillType = type;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('curriculum vitae')),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.all(32.0),
@@ -109,7 +124,10 @@ class MyHomePage extends StatelessWidget {
                     ],
                   ),
                 ),
-                Icon(CupertinoIcons.heart,color: Theme.of(context).primaryColor,),
+                Icon(
+                  CupertinoIcons.heart,
+                  color: Theme.of(context).primaryColor,
+                ),
               ],
             ),
           ),
@@ -120,8 +138,130 @@ class MyHomePage extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyLarge,
             ),
           ),
-          Divider()
+          Divider(),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(32, 16, 32, 12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'Skills',
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(width: 2),
+                Icon(CupertinoIcons.chevron_down, size: 12),
+              ],
+            ),
+          ),
+          SizedBox(height: 8),
+          Center(
+            child: Wrap(
+              direction: Axis.horizontal,
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                skill(
+                  type: SkillType.photoshop,
+                  title: 'photoshop',
+                  imagePath: 'images/app_icon_01.png',
+                  shadowColor: Colors.blue,
+                  isactive: skillType == SkillType.photoshop,
+                  onTap: () => onSkillTap(SkillType.photoshop),
+                ),
+                skill(
+                  type: SkillType.xD,
+                  title: 'Adobe XD',
+                  imagePath: 'images/app_icon_05.png',
+                  shadowColor: Colors.pink,
+                  isactive: skillType == SkillType.xD,
+                  onTap: () => onSkillTap(SkillType.xD),
+                ),
+                skill(
+                  type: SkillType.illustrator,
+                  title: 'illustrator',
+                  imagePath: 'images/app_icon_04.png',
+                  shadowColor: Colors.orangeAccent,
+                  isactive: skillType == SkillType.illustrator,
+                  onTap: () => onSkillTap(SkillType.illustrator),
+                ),
+                skill(
+                  type: SkillType.afterEffects,
+                  title: 'afterEffects',
+                  imagePath: 'images/app_icon_03.png',
+                  shadowColor: Colors.blue.shade700,
+                  isactive: skillType == SkillType.afterEffects,
+                  onTap: () => onSkillTap(SkillType.afterEffects),
+                ),
+                skill(
+                  type: SkillType.lightRoom,
+                  title: 'lightroom',
+                  imagePath: 'images/app_icon_02.png',
+                  shadowColor: Colors.blue,
+                  isactive: skillType == SkillType.lightRoom,
+                  onTap: () => onSkillTap(SkillType.lightRoom),
+                ),
+              ],
+            ),
+          ),
+          Divider(),
         ],
+      ),
+    );
+  }
+}
+
+class skill extends StatelessWidget {
+  final SkillType type;
+  final String imagePath;
+  final String title;
+  final Color shadowColor;
+  final bool isactive;
+  final Function() onTap;
+
+  const skill({
+    super.key,
+    required this.type,
+    required this.imagePath,
+    required this.title,
+    required this.shadowColor,
+    required this.isactive,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: onTap,
+      child: Container(
+        width: 110,
+        height: 110,
+        decoration: isactive
+            ? BoxDecoration(
+                color: Theme.of(context).dividerColor,
+                borderRadius: BorderRadius.circular(20),
+              )
+            : null,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              decoration: isactive ? BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: shadowColor.withValues(alpha: 0.5),
+                    blurRadius: 20,
+                  ),
+                ],
+              ) : null,
+              child: Image.asset(imagePath, width: 40, height: 40),
+            ),
+            SizedBox(height: 8),
+            Text(title),
+          ],
+        ),
       ),
     );
   }
